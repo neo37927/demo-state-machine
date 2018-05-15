@@ -6,7 +6,10 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
+import org.springframework.statemachine.transition.Transition;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalTime;
 
 
 @Slf4j
@@ -18,16 +21,27 @@ public class HonorStateMachineListenerAdapterSupport extends StateMachineListene
     @Override
     public void stateChanged(State<Constants.HonorStates, Constants.HonorEvents> from,
                              State<Constants.HonorStates, Constants.HonorEvents> to) {
-        if (to == null || to.getId().equals(Constants.HonorStates.READY)) return;
+       /* if (to == null || to.getId().equals(Constants.HonorStates.READY)) return;
         machine.sendEvent(MessageBuilder
                 .withPayload(to.getId().getEvent())
-//                .setHeader("foo", "bar")
-                .build());
+                .setHeader("foo", "bar")
+                .build());*/
+    }
+
+    @Override
+    public void stateMachineStarted(StateMachine<Constants.HonorStates, Constants.HonorEvents> stateMachine) {
+        log.info("StateMachineStarted:UUID:{},time:{}",stateMachine.getUuid(), LocalTime.now());
+    }
+
+    @Override
+    public void stateMachineStopped(StateMachine<Constants.HonorStates, Constants.HonorEvents> stateMachine) {
+        log.info("StateMachineEnd:UUID:{},time:{}",stateMachine.getUuid(), LocalTime.now());
     }
 
     public void setMachine(StateMachine<Constants.HonorStates, Constants.HonorEvents> machine) {
         this.machine = machine;
     }
+
 
 
 }

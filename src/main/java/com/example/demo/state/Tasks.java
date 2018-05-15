@@ -3,9 +3,7 @@ package com.example.demo.state;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.ExtendedState;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.WithStateMachine;
 
 import java.util.HashMap;
@@ -16,7 +14,7 @@ public class Tasks {
 
 	private final static Log log = LogFactory.getLog(Tasks.class);
 
-//	private StateMachine<TaskStateMachineFactory.States, TaskStateMachineFactory.Events> stateMachine;
+//	private StateMachine<TaskStateMachineConfigurer.States, TaskStateMachineConfigurer.Events> stateMachine;
 
 	private final Map<String, Boolean> tasks = new HashMap<String, Boolean>();
 
@@ -27,14 +25,14 @@ public class Tasks {
 	}
 
 	/*public void run() {
-		stateMachine.sendEvent(TaskStateMachineFactory.Events.RUN);
+		stateMachine.sendEvent(TaskStateMachineConfigurer.Events.RUN);
 	}
 
 	public void fix() {
 		tasks.put("T1", true);
 		tasks.put("T2", true);
 		tasks.put("T3", true);
-		stateMachine.sendEvent(TaskStateMachineFactory.Events.FIX);
+		stateMachine.sendEvent(TaskStateMachineConfigurer.Events.FIX);
 	}*/
 
 	public void fail(String task) {
@@ -43,22 +41,22 @@ public class Tasks {
 		}
 	}
 
-	@TaskStateMachineFactory.StatesOnTransition(target = TaskStateMachineFactory.States.T1)
+	@TaskStateMachineConfigurer.StatesOnTransition(target = TaskStateMachineConfigurer.States.T1)
 	public void taskT1(ExtendedState extendedState) {
 		runTask("T1", extendedState);
 	}
 
-	@TaskStateMachineFactory.StatesOnTransition(target = TaskStateMachineFactory.States.T2)
+	@TaskStateMachineConfigurer.StatesOnTransition(target = TaskStateMachineConfigurer.States.T2)
 	public void taskT2(ExtendedState extendedState) {
 		runTask("T2", extendedState);
 	}
 
-	@TaskStateMachineFactory.StatesOnTransition(target = TaskStateMachineFactory.States.T3)
+	@TaskStateMachineConfigurer.StatesOnTransition(target = TaskStateMachineConfigurer.States.T3)
 	public void taskT3(ExtendedState extendedState) {
 		runTask("T3", extendedState);
 	}
 
-	@TaskStateMachineFactory.StatesOnTransition(target = TaskStateMachineFactory.States.AUTOMATIC)
+	@TaskStateMachineConfigurer.StatesOnTransition(target = TaskStateMachineConfigurer.States.AUTOMATIC)
 	public void automaticFix(ExtendedState extendedState) {
 		Map<Object, Object> variables = extendedState.getVariables();
 		variables.put("T1", true);

@@ -1,15 +1,12 @@
 package com.example.demo.state;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachineSystemConstants;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.annotation.OnTransition;
-import org.springframework.statemachine.config.EnableStateMachine;
-import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
@@ -25,7 +22,7 @@ import java.util.Map;
 
 //@Configuration
 //@EnableStateMachineFactory
-public class TaskStateMachineFactory extends EnumStateMachineConfigurerAdapter<TaskStateMachineFactory.States, TaskStateMachineFactory.Events> {
+public class TaskStateMachineConfigurer extends EnumStateMachineConfigurerAdapter<TaskStateMachineConfigurer.States, TaskStateMachineConfigurer.Events> {
 
     @Override
     public void configure(StateMachineConfigurationConfigurer<States, Events> config) throws Exception {

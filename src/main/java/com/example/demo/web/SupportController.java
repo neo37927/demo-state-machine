@@ -18,8 +18,13 @@ public class SupportController {
     private HonorStateMachineSupport support;
 
     @RequestMapping("state")
-    public String setState(@RequestParam(required = false,defaultValue = "PARAM") String param )throws Exception{
-        support.start("base-machine", UUID.randomUUID(),param);
+    public String setState(@RequestParam(required = false, defaultValue = "1") String type,
+                           @RequestParam(required = false) Integer times) throws Exception {
+        int i = (times == null|| times == 0) ? 1 : times;
+        while (i > 0) {
+            support.start("base-machine", UUID.randomUUID(), type);
+            i--;
+        }
         return "OK";
     }
 }

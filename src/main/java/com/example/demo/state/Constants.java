@@ -1,22 +1,32 @@
 package com.example.demo.state;
 
+import com.example.demo.state.action.*;
+
 public interface Constants {
 
     /**
      * 征信事件
      */
     enum HonorEvents {
-//        TO_IDLE,
-        TO_CLOSED,
-//        TO_WORK,
-        TO_READY,
-        TO_LOCAL,
-        TO_REMOTE,
-        TASK_HISTORY,
-        TASK_FORK,
-        TASK_CHOICE,
-        TASK_MONITOR,
-        TASK_EXECUTE;
+        TO_CLOSED(null),
+        TO_READY(null),
+        TO_LOCAL(ToLocalAction.class),
+        TO_REMOTE(ToRemoteAction.class),
+        TASK_HISTORY(TaskHistoryAction.class),
+        TASK_FORK(TaskForkAction.class),
+        TASK_CHOICE(TaskChoiceAction.class),
+        TASK_MONITOR(TaskMonitorAction.class),
+        TASK_EXECUTE(TaskExecuteAction.class);
+
+        private Class aClass;
+
+        HonorEvents(Class aClass) {
+            this.aClass = aClass;
+        }
+
+        public Class getaClass() {
+            return aClass;
+        }
     }
 
     /**
@@ -24,8 +34,7 @@ public interface Constants {
      */
     enum HonorStates {
         //工作状态
-//        WORK,
-        REMOTE(HonorEvents.TO_LOCAL),
+        REMOTE(null),//手动触发任务
         REMOTE_END(HonorEvents.TO_LOCAL),
         REMOTE_HISTORY(HonorEvents.TASK_HISTORY),//远程缓存策略
         REMOTE_CHOICE(HonorEvents.TASK_CHOICE),//远程权重策略
@@ -35,9 +44,8 @@ public interface Constants {
         LOCAL_MONITOR(HonorEvents.TASK_EXECUTE),//本地监听器
         LOCAL_EXECUTER(HonorEvents.TO_CLOSED),//本地执行器
 
-        //闲置状态
-//        IDLE,
-        CLOSED(HonorEvents.TO_READY),
+        //结束状态
+        CLOSED(null),
 
         //准备状态
         READY(null);
