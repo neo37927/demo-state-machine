@@ -20,8 +20,10 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class HonorStateMachineSupport {
 
+    @SuppressWarnings("check")
     @Autowired
     private StateMachineFactory<Constants.HonorStates, Constants.HonorEvents> factory;
+
 
     @Autowired
     private HonorStateMachineListenerAdapterSupport listener;
@@ -33,14 +35,12 @@ public class HonorStateMachineSupport {
     private UUID UUID;
 
 //    private HashMap<String,ObjectStateMachineFactory> StateMachinePool;
-    private HashMap<String,HonorDataHttpParam> paramMap;
-    private HashMap<String,HonorData> honorMap;
+    private HashMap<String,HonorDataHttpParam> paramMap = new HashMap<>(3000,Float.valueOf("0.7"));
+    private HashMap<String,HonorData> honorMap = new HashMap<>(3000,Float.valueOf("0.7"));
 
     public void start(String machineId, UUID UUID, String params) throws Exception {
         //构建状态机
         StateMachine<Constants.HonorStates, Constants.HonorEvents> machine = getMachine(UUID, machineId);
-        listener.setMachine(machine);
-
         machine.addStateListener(listener);
         machine.start();
         machine.sendEvent(MessageBuilder
@@ -56,7 +56,7 @@ public class HonorStateMachineSupport {
      * @throws Exception 获取状态机失败
      */
     StateMachine<Constants.HonorStates, Constants.HonorEvents> getMachine(UUID UUID, String machineId) throws Exception {
-        //TODO 状态源池
+        //TODO 状态源池 暂时放弃
         long e = System.nanoTime();
         StateMachine<Constants.HonorStates, Constants.HonorEvents> stateMachine = getFactury(machineId).getStateMachine(UUID, machineId);
         log.info("创建StateMachine：用时：{}", TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - e));
@@ -85,4 +85,10 @@ public class HonorStateMachineSupport {
         return honorMap.get(uuid);
     }
 
+    public void setHonorByUUID(String uuid,HonorData data){
+        honorMap.put(uuid,data);
+    }
+    public String getSimpleUUID(UUID uuid){
+        return uuid.toString().replaceAll("-","").toUpperCase();
+    }
 }

@@ -16,8 +16,6 @@ import java.time.LocalTime;
 @Component
 public class HonorStateMachineListenerAdapterSupport extends StateMachineListenerAdapter<Constants.HonorStates, Constants.HonorEvents> {
 
-    private StateMachine<Constants.HonorStates, Constants.HonorEvents> machine;
-
     @Override
     public void stateChanged(State<Constants.HonorStates, Constants.HonorEvents> from,
                              State<Constants.HonorStates, Constants.HonorEvents> to) {
@@ -37,11 +35,4 @@ public class HonorStateMachineListenerAdapterSupport extends StateMachineListene
     public void stateMachineStopped(StateMachine<Constants.HonorStates, Constants.HonorEvents> stateMachine) {
         log.info("StateMachineEnd:UUID:{},time:{}",stateMachine.getUuid(), LocalTime.now());
     }
-
-    public void setMachine(StateMachine<Constants.HonorStates, Constants.HonorEvents> machine) {
-        this.machine = machine;
-    }
-
-
-
 }

@@ -36,7 +36,7 @@ public interface Constants {
         //工作状态
         REMOTE(null),//手动触发任务
         REMOTE_END(HonorEvents.TO_LOCAL),
-        REMOTE_HISTORY(HonorEvents.TASK_HISTORY),//远程缓存策略
+        LOCAL_HISTORY(HonorEvents.TASK_HISTORY),//远程缓存策略
         REMOTE_CHOICE(HonorEvents.TASK_CHOICE),//远程权重策略
         REMOTE_FORK(HonorEvents.TASK_FORK),//远程遍历策略
 

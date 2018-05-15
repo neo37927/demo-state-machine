@@ -1,11 +1,11 @@
 package com.example.demo.state;
 
+import com.example.demo.state.action.HonorAction;
 import com.example.demo.util.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.statemachine.StateContext;
-import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -28,7 +28,7 @@ public class HonorStateDriveConfigurer extends EnumStateMachineConfigurerAdapter
                 .state(Constants.HonorStates.CLOSED, (context) -> driveEvent(Constants.HonorStates.CLOSED, context))
                 .state(Constants.HonorStates.REMOTE, (context) -> driveEvent(Constants.HonorStates.REMOTE, context))
                 .choice(Constants.HonorStates.REMOTE)
-                .state(Constants.HonorStates.REMOTE_HISTORY, (context) -> driveEvent(Constants.HonorStates.REMOTE_HISTORY, context))
+                .state(Constants.HonorStates.LOCAL_HISTORY, (context) -> driveEvent(Constants.HonorStates.LOCAL_HISTORY, context))
                 .state(Constants.HonorStates.REMOTE_CHOICE, (context) -> driveEvent(Constants.HonorStates.REMOTE_CHOICE, context))
                 .state(Constants.HonorStates.REMOTE_FORK, (context) -> driveEvent(Constants.HonorStates.REMOTE_FORK, context))
                 .state(Constants.HonorStates.REMOTE_END, (context) -> driveEvent(Constants.HonorStates.REMOTE_END, context))
@@ -56,9 +56,9 @@ public class HonorStateDriveConfigurer extends EnumStateMachineConfigurerAdapter
                 .and()
                 .withChoice()
                 .source(Constants.HonorStates.REMOTE)
-                .first(Constants.HonorStates.REMOTE_HISTORY, ((context) -> {
-                    String type = String.valueOf(context.getMessageHeader("type"));
-                    return "1".equals(type);
+                .first(Constants.HonorStates.LOCAL_HISTORY, ((context) -> {
+                    //TODO　１、判断是否使用缓存；２、请求缓存，存在返回ＴＲＵＥ，不存在返回ＦＡＬＳＥ
+                    return executeBooleanAction(Constants.HonorEvents.TASK_HISTORY,context);
                 }))
                 .then(Constants.HonorStates.REMOTE_FORK, ((context) -> {
                     String type = String.valueOf(context.getMessageHeader("type"));
@@ -69,9 +69,9 @@ public class HonorStateDriveConfigurer extends EnumStateMachineConfigurerAdapter
                 })
                 .and()
                 .withExternal()
-                .source(Constants.HonorStates.REMOTE_HISTORY).target(Constants.HonorStates.REMOTE_END)
+                .source(Constants.HonorStates.LOCAL_HISTORY).target(Constants.HonorStates.REMOTE_END)
                 .event(Constants.HonorEvents.TASK_HISTORY)
-                .action((context) -> executeAction(Constants.HonorEvents.TASK_HISTORY,context))
+//                .action((context) -> executeAction(Constants.HonorEvents.TASK_HISTORY,context))
                 .and()
                 .withExternal()
                 .source(Constants.HonorStates.REMOTE_FORK).target(Constants.HonorStates.REMOTE_END)
@@ -126,12 +126,39 @@ public class HonorStateDriveConfigurer extends EnumStateMachineConfigurerAdapter
         if (event == null || event.getaClass() == null) {
             return;
         }
+        //TODO 先后顺序的问题 是否可以并行，同类任务是否自相关？
         log.info("UUID:{},Event:{}", context.getStateMachine().getUuid(),event.name());
         Class clazz = event.getaClass();
-        Map<String,Action> actionMap = SpringContextHolder.getApplicationContext().getBeansOfType(clazz);
-        for (String key : actionMap.keySet()){
-            Action action = actionMap.get(key);
-            action.execute(context);
+        try{
+            Map<String,HonorAction> actionMap = SpringContextHolder.getApplicationContext().getBeansOfType(clazz);
+            for (String key : actionMap.keySet()){
+                HonorAction action = actionMap.get(key);
+                action.execute(context);
+            }
+        }catch (Exception e){
+            log.error("State Action execute error :{}",e);
+        }
+
+
+    }
+    private Boolean executeBooleanAction(Constants.HonorEvents event,StateContext<Constants.HonorStates, Constants.HonorEvents> context){
+        if (event == null || event.getaClass() == null) {
+            //TODO 详细处理
+            return Boolean.FALSE;
+        }
+        //TODO 先后顺序的问题 是否可以并行，同类任务是否自相关？
+        log.info("UUID:{},Event:{}", context.getStateMachine().getUuid(),event.name());
+        try{
+            Class clazz = event.getaClass();
+            Map<String,HonorAction> actionMap = SpringContextHolder.getApplicationContext().getBeansOfType(clazz);
+            for (String key : actionMap.keySet()){
+                HonorAction action = actionMap.get(key);
+                action.execute(context);
+            }
+            return Boolean.TRUE;
+        }catch (Exception e){
+            log.error("State Action execute error :{}",e.getMessage());
+            return Boolean.FALSE;
         }
 
     }
